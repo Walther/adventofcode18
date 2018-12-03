@@ -4,25 +4,25 @@ use std::collections::HashSet;
 fn main() {
     const INPUT: &str = include_str!("input.txt");
     // 2d vector of HashSets: each square stores the ID's that use that square
-    let mut fabric: HashMap<(usize, usize), HashSet<usize>> = HashMap::new();
-    let mut ids: HashSet<usize> = HashSet::new();
+    let mut fabric: HashMap<(i32, i32), HashSet<i32>> = HashMap::new();
+    let mut ids: HashSet<i32> = HashSet::new();
 
     for line in INPUT.lines() {
         // Parse the input
-        let parts: Vec<usize> = line
+        let parts: Vec<i32> = line
             .split(|c| " @#:,x".chars().any(|d| c == d))
             .filter(|s| !s.is_empty())
             .map(|part| part.parse().unwrap())
             .collect();
 
-        let id: usize = parts[0];
+        let id: i32 = parts[0];
         ids.insert(id);
 
-        let start_x: usize = parts[1];
-        let start_y: usize = parts[2];
+        let start_x: i32 = parts[1];
+        let start_y: i32 = parts[2];
 
-        let size_x: usize = parts[3];
-        let size_y: usize = parts[4];
+        let size_x: i32 = parts[3];
+        let size_y: i32 = parts[4];
 
         // For each square in the defined area, insert ID in fabric
         for x in start_x..start_x + size_x {
