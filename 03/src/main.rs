@@ -8,23 +8,21 @@ fn main() {
     let mut ids: HashSet<usize> = HashSet::new();
 
     for line in INPUT.lines() {
-        let instruction: Vec<&str> = line.split(" ").collect();
-        //println!("{:?}", instruction);
-        let id: usize = instruction[0].get(1..).unwrap().parse().unwrap();
+        // Parse the input
+        let parts: Vec<usize> = line
+            .split(|c| " @#:,x".chars().any(|d| c == d))
+            .filter(|s| !s.is_empty())
+            .map(|part| part.parse().unwrap())
+            .collect();
+
+        let id: usize = parts[0];
         ids.insert(id);
-        //println!("{}", id);
-        let coords: Vec<&str> = instruction[2].split(",").collect();
-        let start_x: usize = coords[0].parse().unwrap();
-        let start_y: usize = coords[1]
-            .get(..coords[1].len() - 1)
-            .unwrap()
-            .parse()
-            .unwrap();
-        //println!("{}", start_x);
-        //println!("{}", start_y);
-        let size: Vec<&str> = instruction[3].split("x").collect();
-        let size_x: usize = size[0].parse().unwrap();
-        let size_y: usize = size[1].parse().unwrap();
+
+        let start_x: usize = parts[1];
+        let start_y: usize = parts[2];
+
+        let size_x: usize = parts[3];
+        let size_y: usize = parts[4];
 
         // For each square in the defined area, insert ID in fabric
         for x in start_x..start_x + size_x {
