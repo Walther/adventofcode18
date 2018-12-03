@@ -5,6 +5,7 @@ fn main() {
     const INPUT: &str = include_str!("input.txt");
     // 2d vector of HashSets: each square stores the ID's that use that square
     let mut fabric: HashMap<(i32, i32), HashSet<i32>> = HashMap::new();
+    // Set of all ids
     let mut ids: HashSet<i32> = HashSet::new();
 
     for line in INPUT.lines() {
