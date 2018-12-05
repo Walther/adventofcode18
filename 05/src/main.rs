@@ -1,31 +1,38 @@
+extern crate rayon;
+use rayon::prelude::*;
+
 fn main() {
     const INPUT: &str = include_str!("input.txt");
-    let inputstring: String = String::from(INPUT);
+    let input: Vec<char> = INPUT.chars().collect();
 
     // part 1
-    let polymer = polymerize(&inputstring);
+    let polymer = polymerize(&input);
     println!("{}", polymer.len());
 
     // part 2
-    let polymer_a = polymerize(&filter_unit(&inputstring, 'a'));
-    let polymer_b = polymerize(&filter_unit(&inputstring, 'b'));
-    let polymer_c = polymerize(&filter_unit(&inputstring, 'c'));
-    let polymer_d = polymerize(&filter_unit(&inputstring, 'd'));
-
-    let lengths: Vec<usize> = [polymer_a, polymer_b, polymer_c, polymer_d]
-        .iter()
-        .map(|polymer| polymer.len())
+    // generated the list - can't iterate over a Range of Chars
+    let units = [
+        'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r',
+        's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
+    ];
+    let polymers: Vec<Vec<char>> = units
+        .par_iter() // Parallel power!
+        .map(|unit| polymerize(&filter_unit(&input, *unit)))
         .collect();
-    let shortest = lengths.iter().min().unwrap();
+
+    let shortest = polymers
+        .par_iter()
+        .map(|polymer| polymer.len())
+        .min()
+        .unwrap();
     println!("{}", shortest)
 }
 
-fn polymerize(string: &String) -> String {
-    let chars = string.chars();
+fn polymerize(input: &Vec<char>) -> Vec<char> {
     // Poor man's stack implementation
     let mut polymer: Vec<char> = Vec::new();
     let mut last: char = ' ';
-    for letter in chars {
+    for letter in input {
         if letter.is_lowercase() != last.is_lowercase()
             && letter.to_lowercase().to_string() == last.to_lowercase().to_string()
         {
@@ -36,17 +43,17 @@ fn polymerize(string: &String) -> String {
             };
             continue;
         } else {
-            polymer.push(letter);
-            last = letter;
+            polymer.push(*letter);
+            last = *letter;
         }
     }
-    polymer.iter().collect()
+    polymer
 }
 
-fn filter_unit(string: &String, remove: char) -> String {
-    let chars: Vec<char> = string.chars().collect();
-    chars
+fn filter_unit(input: &Vec<char>, remove: char) -> Vec<char> {
+    input
         .iter()
         .filter(|letter| letter.to_lowercase().to_string() != remove.to_string())
+        .cloned()
         .collect()
 }
