@@ -72,24 +72,10 @@ impl Sleep {
     }
 }
 
-enum EntryType {
-    GuardStart,
-    SleepStart,
-    SleepEnd,
-}
-
 fn get_minute(entry: &str) -> i32 {
     // TODO: prettify
     let regex = Regex::new(r":(\d\d)").unwrap();
-    // oh dear what horror. there must be a better way
-    regex
-        .captures(entry)
-        .unwrap()
-        .get(1)
-        .unwrap()
-        .as_str()
-        .parse()
-        .unwrap()
+    regex.captures(entry).unwrap()[1].parse().unwrap()
 }
 
 fn main() {
@@ -108,17 +94,7 @@ fn main() {
         // Figure out entry type
         if entry.contains("Guard") {
             let regex = Regex::new(r"#(\d*)").unwrap();
-
-            // oh dear what horror. there must be a better way
-            let id: i32 = regex
-                .captures(entry)
-                .unwrap()
-                .get(1)
-                .unwrap()
-                .as_str()
-                .parse()
-                .unwrap();
-            guard_id = id;
+            guard_id = regex.captures(entry).unwrap()[1].parse().unwrap();
         } else if entry.contains("falls asleep") {
             sleep_start = get_minute(entry);
         } else if entry.contains("wakes up") {
@@ -132,11 +108,12 @@ fn main() {
     // wait, does this actually mean i have an array of sorted pointers :D cool!
     let mut guard_list: Vec<&Guard> = guards.values().collect();
     guard_list.sort_by(|a, b| a.sleep_total().cmp(&b.sleep_total()));
-    // TODO: fix ugly mutable circumvent of immutable borrow issue
-    let mut sleepiest = &Guard::new(0);
-    sleepiest = guard_list.last().unwrap();
-
-    println!("{}", sleepiest.id * sleepiest.most_slept_minute());
+    {
+        // This block exists only to keep the lifetime of sleepiest short
+        // to keep the next guard_list.sort possible
+        let sleepiest = guard_list.last().unwrap();
+        println!("{}", sleepiest.id * sleepiest.most_slept_minute());
+    }
 
     // Part 2: Sleepiest guard on specific minute
     guard_list.sort_by(|a, b| a.strategy2().cmp(&b.strategy2()));
