@@ -58,30 +58,16 @@ fn main() {
     }
 
     // Figure out boundaries
-    let a_marker = markers[0].clone();
-    let mut left_top = Point::new(a_marker.x, a_marker.y);
-
-    let mut right_bot = Point::new(a_marker.x, a_marker.y);
-    for marker in markers.iter() {
-        if marker.x < left_top.x {
-            left_top.x = marker.x;
-        }
-        if marker.y < left_top.y {
-            left_top.y = marker.y;
-        }
-        if marker.x > right_bot.x {
-            right_bot.x = marker.y;
-        }
-        if marker.y > right_bot.y {
-            right_bot.y = marker.y;
-        }
-    }
+    let left = markers.iter().map(|m| m.x).min().unwrap();
+    let right = markers.iter().map(|m| m.x).max().unwrap();
+    let top = markers.iter().map(|m| m.y).min().unwrap();
+    let bottom = markers.iter().map(|m| m.y).max().unwrap();
 
     // Count distances to all Markers
     // TODO: rayon parallel power
     let mut distance_sums: Vec<i32> = Vec::new();
-    for x in left_top.x..=right_bot.x {
-        for y in left_top.y..=right_bot.y {
+    for x in left..=right {
+        for y in top..=bottom {
             let mut tile_point = Point::new(x, y);
             let mut distances: Distances = HashMap::new();
             for marker in &markers {
@@ -111,9 +97,9 @@ fn main() {
     // Now we need to filter out the markers whose areas touch the edges
 
     let mut islands = markers.clone();
-    for x in left_top.x..=right_bot.x {
-        for y in left_top.y..=right_bot.y {
-            if x == left_top.x || x == right_bot.x || y == left_top.y || y == right_bot.y {
+    for x in left..=right {
+        for y in top..=bottom {
+            if x == left || x == right || y == top || y == bottom {
                 islands.retain(|marker| !(marker.x == x && marker.y == y));
             }
         }
