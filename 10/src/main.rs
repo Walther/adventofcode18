@@ -86,8 +86,9 @@ fn main() {
 
             // Write file
             let mut data = String::new();
-            for x in bounding_box.0..bounding_box.1 {
-                for y in bounding_box.2..bounding_box.3 {
+            // Printing in computer graphics order instead of math order
+            for y in bounding_box.2..bounding_box.3 {
+                for x in bounding_box.0..bounding_box.1 {
                     let has_star = *grid.get(&(x, y)).unwrap();
                     if has_star {
                         data.push('#')
