@@ -1,6 +1,0 @@
-[package]
-name = "aoc_2018_22"
-version = "0.1.0"
-authors = ["Veeti Haapsamo <veeti.haapsamo@gmail.com>"]
-
-[dependencies]

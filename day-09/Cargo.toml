@@ -1,0 +1,9 @@
+[package]
+name = "day-09"
+version = "0.1.0"
+authors = ["Veeti Haapsamo <veeti.haapsamo@gmail.com>"]
+edition = "2018"
+
+[dependencies]
+regex = "1"
+hashbrown = "0.1.7"

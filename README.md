@@ -4,4 +4,4 @@
 
 This year I'm solving these in [Rust](https://www.rust-lang.org/) ❤️
 
-`cd day; cargo run` should work for all the excercises :)
+`cargo run day-xx` should work for all the excercises :)

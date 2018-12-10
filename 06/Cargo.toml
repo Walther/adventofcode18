@@ -1,9 +1,0 @@
-[package]
-name = "aoc_2018_06"
-version = "0.1.0"
-authors = ["Veeti Haapsamo <veeti.haapsamo@gmail.com>"]
-edition = "2018"
-
-[dependencies]
-rayon = "1"
-uuid = { version = "0.7.1", features = ["v4", "serde"] }
