@@ -69,12 +69,14 @@ fn main() {
             for star in &mut stars {
                 star.step_backward();
             }
+            let bounding_box = get_bounding_box(&stars);
+
             // Grid
             let mut grid: HashMap<(i64, i64), bool> = HashMap::new();
 
             // Clear
-            for x in bounding_box.0..bounding_box.1 {
-                for y in bounding_box.2..bounding_box.3 {
+            for x in bounding_box.0..=bounding_box.1 {
+                for y in bounding_box.2..=bounding_box.3 {
                     *grid.entry((x, y)).or_insert(false) = false;
                 }
             }
@@ -87,8 +89,8 @@ fn main() {
             // Write file
             let mut data = String::new();
             // Printing in computer graphics order instead of math order
-            for y in bounding_box.2..bounding_box.3 {
-                for x in bounding_box.0..bounding_box.1 {
+            for y in bounding_box.2..=bounding_box.3 {
+                for x in bounding_box.0..=bounding_box.1 {
                     let has_star = *grid.get(&(x, y)).unwrap();
                     if has_star {
                         data.push('#')
