@@ -3,14 +3,14 @@ use std::collections::HashMap;
 
 fn main() {
     const INPUT: &str = include_str!("input.txt");
-    let grid_serial: i64 = INPUT.parse().unwrap();
-    let cells: HashMap<(i64, i64), i64> =
+    let grid_serial: i32 = INPUT.parse().unwrap();
+    let cells: HashMap<(i32, i32), i32> =
     // Populate the fuel cells
-    (1..301i64).into_par_iter().flat_map(|x| {
-        (1..301i64).into_par_iter().map(move |y| {
+    (1..301).into_par_iter().flat_map(|x| {
+        (1..301).into_par_iter().map(move |y| {
             let cell_rack_id = x + 10;
             let mut power_level = cell_rack_id * y;
-            power_level += grid_serial;
+            power_level = power_level + grid_serial;
             power_level *= cell_rack_id;
             if power_level < 100 {
                 power_level = 0;
@@ -23,40 +23,62 @@ fn main() {
         })
     }).collect();
 
-    // Explicit borrow. Srs bsns. How does this work? Why?
-    let ref_cells = &cells;
-
-    // Sum all 3x3's
-    let sum_cells: HashMap<(i64, i64), i64> =
-    // main grid x
-    (1i64..299i64).into_par_iter().flat_map(|grid_x| {
-        // main grid y
-        (1i64..299i64).into_par_iter().map(move |grid_y| {
-            // hashmap's struct tuple
-            (
-                // coordinates tuple for the 3x3 square's top-left
-                (grid_x , grid_y),
-                // offsets for calculating sum of 3x3
-                (0i64..3i64).into_par_iter().flat_map(|offset_x| {
-                    (0i64..3i64).into_par_iter().map(move |offset_y| {
-                        // get the value at this coord+offset
-                        ref_cells.get(&(grid_x + offset_x, grid_y + offset_y )).unwrap()
-                    })
-                })
-                .sum::<i64>()
-            )
-        })
-    })
-    .collect();
-
     // Part 1
+    // Sum all 3x3's && find best
+    let sum_cells3 = sum_cells(&cells, 3);
+
     // Find best
-    let ((x, y), sum) = sum_cells.iter().fold(((1i64, 1i64), 0i64), |acc, entry| {
-        if entry.1 > &acc.1 {
-            return (*entry.0, *entry.1);
-        } else {
-            return acc;
-        }
-    });
+    let ((x, y, _), sum) = sum_cells3
+        .into_par_iter()
+        .max_by_key(|&((_x, _y, _z), sum)| sum)
+        .unwrap();
     println!("{}, {}, {}", x, y, sum);
+
+    // Part 2
+    // Get all sums from 1x1 to 300x300
+    let sum_cells_all: Vec<HashMap<(i32, i32, i32), i32>> = (1..301)
+        .into_par_iter()
+        .map(|square_size| sum_cells(&cells, square_size))
+        .collect();
+    // Find best
+    let ((x, y, z), sum) = sum_cells_all
+        .iter()
+        .map(|hashmap| {
+            hashmap
+                .iter()
+                .max_by_key(|&((_x, _y, _z), sum)| sum)
+                .unwrap()
+        })
+        .max_by_key(|&((_x, _y, _z), sum)| sum)
+        .unwrap();
+    println!("{}, {}, {}, {}", x, y, z, sum);
+}
+
+fn sum_cells(cells: &HashMap<(i32, i32), i32>, square_size: i32) -> HashMap<(i32, i32, i32), i32> {
+    println!("Summing window size: {}", square_size);
+    // max x coordinate, considering square_size
+    let max_x: i32 = 300 - square_size + 1;
+    // main grid x
+    (1..max_x + 1)
+        .into_par_iter()
+        .flat_map(|grid_x| {
+            // main grid y
+            (1..max_x + 1).into_par_iter().map(move |grid_y| {
+                // hashmap's struct tuple
+                (
+                    // coordinates tuple for the NxN square's top-left & square_size
+                    (grid_x, grid_y, square_size),
+                    // offsets for calculating sum of NxN
+                    (0..square_size)
+                        .flat_map(|offset_x| {
+                            (0..square_size).map(move |offset_y| {
+                                // get the value at this coord+offset
+                                cells.get(&(grid_x + offset_x, grid_y + offset_y)).unwrap()
+                            })
+                        })
+                        .sum::<i32>(),
+                )
+            })
+        })
+        .collect()
 }
