@@ -55,16 +55,11 @@ fn main() {
 }
 
 fn valuate(lumber_area: &LumberArea) -> i32 {
-    let trees = lumber_area
-        .values()
-        .filter(|&acre| *acre == Tree)
-        .collect::<Vec<&Acre>>()
-        .len() as i32;
+    let trees = lumber_area.values().filter(|&acre| *acre == Tree).count() as i32;
     let lumberyards = lumber_area
         .values()
         .filter(|&acre| *acre == Lumberyard)
-        .collect::<Vec<&Acre>>()
-        .len() as i32;
+        .count() as i32;
     trees * lumberyards
 }
 
@@ -91,13 +86,7 @@ fn step_acre(x: i32, y: i32, lumber_area: &LumberArea) -> Acre {
     }
     match current {
         Ground => {
-            if neighbors
-                .iter()
-                .filter(|&acre| *acre == &Tree)
-                .collect::<Vec<&&Acre>>()
-                .len()
-                >= 3
-            {
+            if neighbors.iter().filter(|&acre| *acre == &Tree).count() >= 3 {
                 Tree
             } else {
                 Ground
@@ -107,8 +96,7 @@ fn step_acre(x: i32, y: i32, lumber_area: &LumberArea) -> Acre {
             if neighbors
                 .iter()
                 .filter(|&acre| *acre == &Lumberyard)
-                .collect::<Vec<&&Acre>>()
-                .len()
+                .count()
                 >= 3
             {
                 Lumberyard
